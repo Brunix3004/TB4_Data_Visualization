@@ -14,7 +14,7 @@ st.set_page_config(
 # ==================================================
 # CARGAR DATA
 # ==================================================
-df = pd.read_csv("merged_imputed.csv")
+df = pd.read_csv("data/merged_imputed.csv")
 
 # Solo años del trabajo
 df = df[(df["year"] >= 2000) & (df["year"] <= 2020)].copy()
