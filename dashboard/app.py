@@ -118,6 +118,14 @@ with col1:
 
         st.plotly_chart(fig1, width="stretch")
 
+        leader = top5.iloc[0]
+
+        st.caption(
+            f"Entre 2000 y 2020, **{leader['country']}** registró el mayor incremento "
+            f"en la participación de energías renovables, con un aumento de "
+            f"**{leader['Incremento']:.2f} puntos porcentuales**."
+        )
+
     else:
         st.warning("El rango seleccionado debe incluir los años 2000 y 2020.")
 
@@ -154,6 +162,27 @@ with col2:
         )
 
         st.plotly_chart(fig2, width="stretch")
+
+        region_change = (
+            region_df
+            .pivot(index="region", columns="year", values="carbon_intensity_elec")
+            .dropna(subset=[2000, 2020])
+        )
+
+        region_change["Cambio"] = region_change[2020] - region_change[2000]
+
+        region_best = region_change["Cambio"].idxmin()   # Mayor reducción
+        region_worst = region_change["Cambio"].idxmax()  # Mayor incremento
+
+        reduction = abs(region_change.loc[region_best, "Cambio"])
+        increase = region_change.loc[region_worst, "Cambio"]
+
+        st.caption(
+            f"Entre 2000 y 2020, **{region_best}** fue la región que más redujo "
+            f"la intensidad de carbono (**{reduction:.1f} unidades**), mientras que "
+            f"**{region_worst}** presentó el mayor incremento "
+            f"(**+{increase:.1f} unidades**)."
+        )
 
     else:
         st.error(
