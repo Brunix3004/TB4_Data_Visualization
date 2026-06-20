@@ -3,6 +3,8 @@
 Dashboard interactivo desarrollado con Streamlit para analizar indicadores de
 energía mundial entre 2000 y 2020.
 
+Enlace del deploy: https://tb4dvgroup3.streamlit.app/
+
 ## Ejecución local
 
 Ejecutar los siguientes comandos desde la raíz del repositorio.
