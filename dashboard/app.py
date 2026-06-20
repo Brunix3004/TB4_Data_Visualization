@@ -322,3 +322,99 @@ else:
 
         st.plotly_chart(fig8, use_container_width=True)
         st.caption(f"Valores normalizados 0-1 dentro de América Latina. Año de referencia: {ref_year}. Valores reales en las métricas superiores.")
+
+st.divider()
+
+# ==================================================
+# GRÁFICO 9 — Consumo de energía per cápita
+# ==================================================
+st.subheader("📈 P9 · Trayectoria de Perú en consumo de energía per cápita")
+
+P9_COUNTRIES = ["Peru", "Chile", "Colombia", "Brazil"]
+P9_COLORS = {
+    "Peru": "#d6604d",
+    "Chile": "#4393c3",
+    "Colombia": "#74add1",
+    "Brazil": "#8073ac",
+}
+
+df_p9 = (
+    df[df["country"].isin(P9_COUNTRIES)]
+    [["country", "year", "energy_per_capita"]]
+    .dropna(subset=["energy_per_capita"])
+    .sort_values(["year", "country"])
+)
+
+missing_countries = set(P9_COUNTRIES) - set(df_p9["country"].unique())
+
+if missing_countries:
+    st.warning(
+        "No hay datos de consumo energético per cápita para: "
+        + ", ".join(sorted(missing_countries))
+        + "."
+    )
+else:
+    fig9 = px.line(
+        df_p9,
+        x="year",
+        y="energy_per_capita",
+        color="country",
+        markers=True,
+        category_orders={"country": P9_COUNTRIES},
+        color_discrete_map=P9_COLORS,
+        labels={
+            "year": "Año",
+            "energy_per_capita": "Consumo de energía per cápita (kWh)",
+            "country": "País",
+        },
+    )
+
+    # Destacar Perú frente a los tres países de comparación.
+    for trace in fig9.data:
+        if trace.name == "Peru":
+            trace.update(line=dict(width=4), marker=dict(size=8))
+        else:
+            trace.update(line=dict(width=2), marker=dict(size=6))
+
+    fig9.update_traces(
+        hovertemplate=(
+            "<b>%{fullData.name}</b><br>"
+            "Año: %{x}<br>"
+            "Consumo: %{y:,.0f} kWh por persona"
+            "<extra></extra>"
+        )
+    )
+    fig9.update_layout(
+        legend_title="País",
+        height=540,
+        hovermode="x unified",
+    )
+
+    st.plotly_chart(fig9, use_container_width=True)
+
+    # Medir la distancia de Perú respecto al promedio de Chile, Colombia y Brasil.
+    p9_pivot = df_p9.pivot_table(
+        index="year",
+        columns="country",
+        values="energy_per_capita",
+        aggfunc="mean",
+    ).dropna(subset=P9_COUNTRIES)
+
+    if not p9_pivot.empty:
+        p9_pivot["promedio_comparacion"] = p9_pivot[
+            ["Chile", "Colombia", "Brazil"]
+        ].mean(axis=1)
+        p9_pivot["brecha_peru"] = (
+            p9_pivot["Peru"] - p9_pivot["promedio_comparacion"]
+        ).abs()
+
+        year_closest = p9_pivot["brecha_peru"].idxmin()
+        year_farthest = p9_pivot["brecha_peru"].idxmax()
+
+        st.caption(
+            f"En el rango seleccionado, Perú estuvo más cerca del promedio de Chile, "
+            f"Colombia y Brasil en {year_closest} "
+            f"(brecha de {p9_pivot.loc[year_closest, 'brecha_peru']:,.0f} kWh por persona) "
+            f"y más lejos en {year_farthest} "
+            f"(brecha de {p9_pivot.loc[year_farthest, 'brecha_peru']:,.0f} kWh por persona)."
+        )
