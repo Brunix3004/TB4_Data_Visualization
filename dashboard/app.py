@@ -241,7 +241,7 @@ else:
     )
     
 
-    st.plotly_chart(fig_scatter3, use_container_width=True)
+    st.plotly_chart(fig_scatter3, width='stretch')
 
 st.divider()
 
@@ -294,7 +294,7 @@ else:
     )
     
     # 5. Mostrar el gráfico en Streamlit
-    st.plotly_chart(fig_scatter, use_container_width=True)
+    st.plotly_chart(fig_scatter, width='stretch')
     
     # 6. Mostrar la métrica del conteo de países de forma dinámica
     st.metric(
@@ -327,7 +327,7 @@ fig5.update_yaxes(autorange="reversed", dtick=1, title="Ranking")
 fig5.update_xaxes(dtick=2, title="Año")
 fig5.update_layout(height=600, hovermode="x unified")
 
-st.plotly_chart(fig5, use_container_width=True)
+st.plotly_chart(fig5, width='stretch')
 
 st.divider()
 
@@ -363,7 +363,7 @@ if not datos_pais.empty:
     fig6.update_xaxes(range=[0, 100])
     fig6.update_layout(height=400)
 
-    st.plotly_chart(fig6, use_container_width=True)
+    st.plotly_chart(fig6, width='stretch')
 else:
     st.warning(f"No hay datos para {pais_seleccionado}.")
 
@@ -422,7 +422,7 @@ if 2000 in pivot_ci.columns and 2020 in pivot_ci.columns:
         )]
     )
 
-    st.plotly_chart(fig7, use_container_width=True)
+    st.plotly_chart(fig7, width='stretch')
 
 else:
     st.warning("No hay datos de carbon_intensity_elec para 2000 y 2020 en América Latina.")
@@ -533,7 +533,7 @@ else:
                 delta=f"{arrow} {abs(diff):.2f} vs. prom. AL"
             )
 
-        st.plotly_chart(fig8, use_container_width=True)
+        st.plotly_chart(fig8, width='stretch')
         st.caption(f"Valores normalizados 0-1 dentro de América Latina. Año de referencia: {ref_year}. Valores reales en las métricas superiores.")
 
 st.divider()
@@ -615,7 +615,7 @@ else:
         hovermode="x unified",
     )
 
-    st.plotly_chart(fig9, use_container_width=True)
+    st.plotly_chart(fig9, width='stretch')
 
     # Medir la distancia de Perú respecto al promedio de Chile, Colombia y Brasil.
     p9_pivot = df_p9.pivot_table(
