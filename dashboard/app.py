@@ -299,7 +299,7 @@ st.divider()
 # ==================================================
 # GRÁFICO 5 - Ranking de consumo per cápita
 # ==================================================
-st.subheader("📊 Ranking de los 12 mayores consumidores de energía per cápita")
+st.subheader("📊 P5 · Ranking de los 12 mayores consumidores de energía per cápita")
 
 top12 = (
     df[df["year"].between(2000, 2020)]
@@ -327,7 +327,7 @@ st.divider()
 # ==================================================
 # GRÁFICO 6 — Mix eléctrico por país
 # ==================================================
-st.subheader("⚡ Mix eléctrico por país (año de mayor producción renovable)")
+st.subheader("⚡ P6 · Mix eléctrico por país (año de mayor producción renovable)")
 
 paises = sorted(df["country"].unique())
 pais_seleccionado = st.selectbox("Selecciona un país", paises, key="pais_mix")
