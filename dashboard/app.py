@@ -156,6 +156,71 @@ with col2:
 
 st.divider()
 
+# ==================================================
+# GRÁFICO 5 - Ranking de consumo per cápita
+# ==================================================
+st.subheader("📊 Ranking de los 12 mayores consumidores de energía per cápita")
+
+top12 = (
+    df[df["year"].between(2000, 2020)]
+    .groupby("year")[["country", "year", "energy_per_capita"]]
+    .apply(lambda g: g.nlargest(12, "energy_per_capita"))
+    .reset_index(drop=True)
+)
+top12["rank"] = top12.groupby("year")["energy_per_capita"].rank(
+    ascending=False, method="first"
+)
+
+fig5 = px.line(
+    top12, x="year", y="rank", color="country", markers=True,
+    title="Qatar lideró el ranking de consumo energético per cápita entre 2000 y 2020"
+)
+
+fig5.update_yaxes(autorange="reversed", dtick=1, title="Ranking")
+fig5.update_xaxes(dtick=2, title="Año")
+fig5.update_layout(height=600, hovermode="x unified")
+
+st.plotly_chart(fig5, use_container_width=True)
+
+st.divider()
+
+# ==================================================
+# GRÁFICO 6 — Mix eléctrico por país
+# ==================================================
+st.subheader("⚡ Mix eléctrico por país (año de mayor producción renovable)")
+
+paises = sorted(df["country"].unique())
+pais_seleccionado = st.selectbox("Selecciona un país", paises, key="pais_mix")
+
+fuentes = ["coal_electricity", "gas_electricity", "nuclear_electricity", "solar_electricity", "wind_electricity", "hydro_electricity"]
+etiquetas = ["Carbón", "Gas", "Nuclear", "Solar", "Eólica", "Hidro"]
+
+datos_pais = df[df["country"] == pais_seleccionado].copy()
+if not datos_pais.empty:
+    anio_max_ren = datos_pais.loc[datos_pais["renewables_electricity"].idxmax(), "year"]
+    fila = datos_pais[datos_pais["year"] == anio_max_ren].iloc[0]
+    valores = [fila[f] for f in fuentes]
+    pct = [v / sum(valores) * 100 if sum(valores) > 0 else 0 for v in valores]
+
+    tabla_mix = pd.DataFrame({"fuente": etiquetas, "porcentaje": pct, "categoria": ""})
+    tabla_mix = tabla_mix.sort_values("porcentaje", ascending=False)
+
+    fig6 = px.bar(
+        tabla_mix, x="porcentaje", y="categoria", color="fuente", orientation="h",
+        barmode="stack", text_auto=".1f",
+        title=f"Mix eléctrico ({pais_seleccionado} - {int(anio_max_ren)})",
+        labels={"porcentaje": "Porcentaje (%)", "categoria": ""},
+        category_orders={"fuente": tabla_mix["fuente"].tolist()}
+    )
+
+    fig6.update_xaxes(range=[0, 100])
+    fig6.update_layout(height=400)
+
+    st.plotly_chart(fig6, use_container_width=True)
+else:
+    st.warning(f"No hay datos para {pais_seleccionado}.")
+
+st.divider()
 
 # ==================================================
 # GRÁFICO 7 — América Latina: intensidad de carbono
