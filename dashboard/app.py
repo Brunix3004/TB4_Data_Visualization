@@ -201,7 +201,6 @@ else:
     st.plotly_chart(fig_scatter3, use_container_width=True)
 
 st.divider()
-
 # ==================================================
 # GRÁFICO 4 — Acceso a electricidad vs. Combustibles fósiles (Dinámico)
 # ==================================================
@@ -259,6 +258,36 @@ else:
         value=len(df_elec)
     )
 st.divider()
+
+# ==================================================
+# GRÁFICO 5 - Ranking de consumo per cápita
+# ==================================================
+st.subheader("📊 Ranking de los 12 mayores consumidores de energía per cápita")
+
+top12 = (
+    df[df["year"].between(2000, 2020)]
+    .groupby("year")[["country", "year", "energy_per_capita"]]
+    .apply(lambda g: g.nlargest(12, "energy_per_capita"))
+    .reset_index(drop=True)
+)
+top12["rank"] = top12.groupby("year")["energy_per_capita"].rank(
+    ascending=False, method="first"
+)
+
+fig5 = px.line(
+    top12, x="year", y="rank", color="country", markers=True,
+    title="Qatar lideró el ranking de consumo energético per cápita entre 2000 y 2020"
+)
+
+fig5.update_yaxes(autorange="reversed", dtick=1, title="Ranking")
+fig5.update_xaxes(dtick=2, title="Año")
+fig5.update_layout(height=600, hovermode="x unified")
+
+st.plotly_chart(fig5, use_container_width=True)
+
+st.divider()
+
+
 
 # ==================================================
 # GRÁFICO 7 — América Latina: intensidad de carbono
@@ -521,3 +550,37 @@ else:
             f"y más lejos en {year_farthest} "
             f"(brecha de {p9_pivot.loc[year_farthest, 'brecha_peru']:,.0f} kWh por persona)."
         )
+
+st.divider()
+
+# ==================================================
+# PREGUNTA 10 — Argumentación verbal sobre P9
+# ==================================================
+st.subheader("🗣️ P10 · Justificación del diseño del gráfico P9")
+
+st.markdown(
+    """
+    Elegimos un gráfico de líneas para la pregunta 9 porque la variable que queremos
+    responder cambia a lo largo del tiempo: el consumo de energía per cápita entre 2000
+    y 2020. La línea permite seguir la trayectoria continua de cada país, comparar su
+    tendencia, crecimiento, caída o estabilidad  y reconocer con facilidad los años en
+    que Perú se acerca o se aleja de Chile, Colombia y Brasil. Un gráfico de barras
+    obligaría a comparar 84 barras y dificultaría percibir la evolución temporal; en
+    cambio, la conexión de los puntos hace explícito el orden cronológico.
+
+    El *encoding* visual principal es la posición horizontal, que representa el año, y
+    la posición vertical, que representa el consumo de energía per cápita en kWh. El
+    color diferencia a cada país y el grosor mayor de la línea roja resalta a Perú,
+    que es el caso de interés. Los marcadores muestran las observaciones anuales y la
+    línea las conecta en orden temporal. Usar una medida per cápita es imporante porque
+    permite una comparación más justa entre países con poblaciones de tamaños muy distintos.
+
+    La principal limitación es que, si se añadieran muchas más series, las líneas y
+    colores se superpondrían y producirían ruido visual. Además, al compartir una sola
+    escala vertical, los cambios pequeños de Perú pueden quedar menos visibles frente a
+    los niveles más altos de Chile. Por eso el gráfico funciona bien con estos cuatro
+    países y se complementa con el *hover* y el filtro temporal; para analizar cambios
+    muy cortos o variaciones interanuales convendría usar *zoom*, anotar periodos
+    específicos o una visualización adicional de variaciones porcentuales.
+    """
+)
